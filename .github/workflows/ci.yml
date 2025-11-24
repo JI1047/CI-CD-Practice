@@ -1,0 +1,64 @@
+#
+#GitHub Actions는 .github/workflows/ 안에 있는 YAML 파일만 자동으로 읽어서 실행해.
+#즉:
+#.github 폴더 필요
+#그 안에 workflows 폴더 필요
+#그 안에 .yml 파일이 필요 (파일명은 자유, ci.yml OK)
+
+# 워크플로우 이름을 "Node.js CI"로 설정합니다.
+# githubactions화면에서 표시되는 이름
+# CI 파이프라인이라는 의미
+name: Node.js CI
+
+# 어떤 이벤트가 발생했을 때 워크플로우를 실행할지 정의합니다.
+on:
+  push: # 코드가 저장소로 푸시될 때 워크플로우를 실행합니다.
+    branches:
+      - main # main 브랜치에 코드가 푸시될 때 실행합니다.
+  pull_request: # 풀 리퀘스트가 생성 또는 갱신될 때도 워크플로우를 실행합니다.
+    branches:
+      - main # main 브랜치로 풀 리퀘스트가 열리거나 갱신될 때 실행합니다.
+
+# 누군가 main 브랜치에 push하거나 pr생성해서 병합할 때 둘다 테스트 실행
+
+
+# 이거는 이제 깃허브 액션 서버 vm에서 실행되는거다
+# 실행할 작업을 정의하는 영역입니다.
+jobs:
+  build: # 작업의 이름을 "build"로 정의합니다.
+    runs-on: ubuntu-latest # 최신 Ubuntu 환경에서 작업을 수행합니다.
+
+    # 작업을 다양한 환경에서 병렬로 실행할 수 있도록 전략을 정의합니다.
+    strategy:
+      # 병렬 실행을 위한 환경 변수 집합을 설정합니다.
+      matrix:
+        # Node.js 버전 19.x, 20.x, 22.x 환경에서 병렬로 작업을 실행합니다.
+        # 우리 서비스가 여러 node 버전에서도 잘돌아가나?
+        node-version: [19.x, 20.x, 22.x]
+
+    # 각 작업에서 실행할 단계(step)들을 정의합니다.
+    steps:
+      # 소스 코드를 체크아웃합니다.
+      - name: Checkout repository
+        # GitHub 공식 checkout 액션을 사용하여 저장소의 코드를 가져옵니다.
+        # github의 repository를 vm에 다운로드한다.
+        uses: actions/checkout@v2
+
+      # Node.js 환경을 설정합니다.
+      - name: Set up Node.js
+        # Node.js를 설치하기 위한 공식 액션을 사용합니다.
+        uses: actions/setup-node@v2
+        # 액션에 추가적인 매개변수를 전달합니다.
+        with:
+          # 설정한 Node.js 버전을 사용하여 환경을 세팅합니다.
+          node-version: ${{ matrix.node-version }}
+
+      # 프로젝트의 의존성 패키지들을 설치합니다.
+      - name: Install dependencies
+        # npm install 명령을 실행하여 의존성을 설치합니다.
+        run: npm install
+
+      # 프로젝트의 테스트를 실행합니다.
+      - name: Run tests
+        # npm test 명령을 실행하여 테스트를 수행합니다.
+        run: npm test

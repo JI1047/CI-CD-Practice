@@ -26,7 +26,7 @@ describe('GET /', () => {
   it('should return Hello, World!', async () => {
     /**
      * express에 get /요청을 보냄 res에 응답을 저장함
-     * supertest가 내부적으로 처리하게됨 서버가 필요가 없음
+     * supertest가 내부적으로 처리하게됨 서버가 필요가 없음.
      */
     const res = await request(app).get('/');
     /**

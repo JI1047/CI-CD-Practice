@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 /**
  * 테스트 묶음
- * Jest에서 describe는 테스트 코드를 묶는 행위 GEt / 요청이라는 것을 묶는 행위
+ * Jest에서 describe는 테스트 코드를 묶는 행위 GEt / 요청이라는 것을 묶는 행
  */
 describe('GET /', () => {
   it('should return Hello, World!', async () => {
